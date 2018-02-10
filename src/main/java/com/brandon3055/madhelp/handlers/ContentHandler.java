@@ -17,6 +17,8 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static com.brandon3055.madhelp.MadHelp.SELECT;
+
 /**
  * Created by brandon3055 on 17/9/2015.
  */
@@ -446,8 +448,8 @@ public class ContentHandler {
 				writer.name("info").beginArray()
 						.value("[c]This is an example map info page")
 						.value("Ok so this is just a page where the pack maker can dump a LOT of information about the map")
-						.value("Each individual string you add to the json file is turned into a new paragraph like this!. You can add §0c§1o§2l§3o§4u§5r§6s§7.§8.§9.§a.§b.§c.§d.§e.§f.§r And §l§n§oFormatting!§r §k\\\"Secret Text!\\\"\"")
-						.value("To add formatting you simply add the selector symbol \"§\" then any of the standard minecraft formatting codes")
+						.value("Each individual string you add to the json file is turned into a new paragraph like this!. You can add " + SELECT + "0c" + SELECT + "1o" + SELECT + "2l" + SELECT + "3o" + SELECT + "4u" + SELECT + "5r" + SELECT + "6s" + SELECT + "7." + SELECT + "8." + SELECT + "9." + SELECT + "a." + SELECT + "b." + SELECT + "c." + SELECT + "d." + SELECT + "e." + SELECT + "f." + SELECT + "r And " + SELECT + "l" + SELECT + "n" + SELECT + "oFormatting!" + SELECT + "r " + SELECT + "k\\\"Secret Text!\\\"\"")
+						.value("To add formatting you simply add the selector symbol \"" + SELECT + "\" then any of the standard minecraft formatting codes")
 						.value("[c]You can also center a paragraph by adding \"[c]\" to the start of it (before any formatting)");
 				writer.endArray();
 				writer.name("releaseNumber").value("0");

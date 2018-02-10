@@ -19,6 +19,7 @@ public class MadHelp
 	public static final String MODNAME = "Mad Help";
     public static final String MODID = "MadHelp";
     public static final String VERSION = "${mod_version}";
+	public static final String SELECT = "\u00A7";
 
 	public MadHelp(){ LogHelper.info("Hello Minecraft!!!");}
 
