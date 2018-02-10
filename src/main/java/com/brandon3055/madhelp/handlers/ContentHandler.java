@@ -1,7 +1,6 @@
 package com.brandon3055.madhelp.handlers;
 
 import com.brandon3055.brandonscore.handlers.FileHandler;
-import com.brandon3055.brandonscore.handlers.ZipHelper;
 import com.brandon3055.madhelp.LogHelper;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -14,10 +13,9 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Created by brandon3055 on 17/9/2015.
@@ -27,6 +25,7 @@ public class ContentHandler {
 	public static List<DownloadableContent> compiledContentList = new ArrayList<DownloadableContent>();
 	public static String status = "OK";
 	public static DownloadThread downloadThread;
+	public static UnzipThread unZipThread;
 	public static Map<String, Integer> cachedVersions = new HashMap<String, Integer>();
 	public static Map<String, Boolean> updates = new HashMap<String, Boolean>();
 	public static Pair<List<String>, Integer> splashScreen = new Pair<List<String>, Integer>(new ArrayList<String>(), 0);
@@ -413,14 +412,15 @@ public class ContentHandler {
 		tempFolder = new File(FileHandler.mcDirectory, "saves/.download-temp");
 		if (tempFolder.exists()) FileUtils.deleteDirectory(tempFolder);
 
-		ZipHelper.unzip(zipFile, tempFolder);
+		unZipThread = new UnzipThread(zipFile, tempFolder);
+		unZipThread.start();
 	}
 
 	public static File worldFolder;
 	public static File saveFolder;
 	public static String sortTheFolders(){
 		File[] files = ContentHandler.tempFolder.listFiles(new FilterFolders());
-		if (files.length == 0) return "Could not find a world folder in the unzipped file!";
+		if (files == null || files.length == 0) return "Could not find a world folder in the unzipped file!";
 		else if (files.length > 1) return "Found more then one folder in the unzipped file! @Mod Pack Maker: There should only be one folder in the zip file and that folder should be the world save folder";
 
 		worldFolder = files[0];
@@ -613,6 +613,62 @@ public class ContentHandler {
 		}
 	}
 
+	public static class UnzipThread extends Thread {
+        private final File zipFile;
+        private final File destination;
+        public String error = null;
+        public volatile boolean finished = false;
+        public volatile int size = 0;
+        public volatile int processed = 0;
+
+        public UnzipThread(File zipFile, File destination) {
+            super("MadHelp-World-Un-zipper");
+            this.zipFile = zipFile;
+            this.destination = destination;
+        }
+
+        @Override
+        public void run() {
+            try {
+
+                ZipFile zip = new ZipFile(zipFile);
+
+                destination.mkdir();
+                Enumeration zipFileEntries = zip.entries();
+                size = zip.size();
+
+                while (zipFileEntries.hasMoreElements()) {
+                    ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
+                    String currentEntry = entry.getName();
+                    File destFile = new File(destination, currentEntry);
+                    File destinationParent = destFile.getParentFile();
+                    destinationParent.mkdirs();
+
+                    if (!entry.isDirectory()) {
+                        BufferedInputStream is = new BufferedInputStream(zip.getInputStream(entry));
+                        int currentByte;
+                        byte data[] = new byte[2048];
+                        FileOutputStream fos = new FileOutputStream(destFile);
+                        BufferedOutputStream dest = new BufferedOutputStream(fos, 2048);
+                        while ((currentByte = is.read(data, 0, 2048)) != -1) {
+                            dest.write(data, 0, currentByte);
+                        }
+                        dest.flush();
+                        dest.close();
+                        is.close();
+                    }
+                    processed++;
+                }
+                finished = true;
+
+            }
+            catch (Throwable e) {
+				finished = true;
+				error = e.getMessage();
+				e.printStackTrace();
+            }
+        }
+    }
 	public static class FilterFolders implements FileFilter {
 		@Override
 		public boolean accept(File pathname) {

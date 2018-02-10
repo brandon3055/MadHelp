@@ -100,16 +100,30 @@ public class GuiDownloading extends GuiScreen implements GuiYesNoCallback {
             buttonCancel.visible = false;
             if (guiTick < 2) return;
 
-            //Unzip the file
-            try {
-                ContentHandler.unZipFile(content);
-            }
-            catch (IOException e) {
-                LogHelper.error("Unzip Failed");
-                message = "Failed to unzip the map - " + e.getLocalizedMessage();
-                installStage = 4;
-                e.printStackTrace();
+            if (ContentHandler.unZipThread != null && !ContentHandler.unZipThread.finished) {
                 return;
+            }
+            else if (ContentHandler.unZipThread != null && ContentHandler.unZipThread.finished) {
+                if (ContentHandler.unZipThread.error != null) {
+                    message = ContentHandler.unZipThread.error;
+                    installStage = 4;
+                    return;
+                }
+                ContentHandler.unZipThread = null;
+            }
+            else if (ContentHandler.unZipThread == null) {
+                //Unzip the file
+                try {
+                    ContentHandler.unZipFile(content);
+                    return;
+                }
+                catch (IOException e) {
+                    LogHelper.error("Unzip Failed");
+                    message = "Failed to unzip the map - " + e.getLocalizedMessage();
+                    installStage = 4;
+                    e.printStackTrace();
+                    return;
+                }
             }
 
             //Find the world folder inside the temp folder (Will assume that the first folder found is the world folder)
@@ -212,7 +226,6 @@ public class GuiDownloading extends GuiScreen implements GuiYesNoCallback {
         drawDefaultBackground();
 
         if (installStage == 1) {
-
             mc.renderEngine.bindTexture(guiElements);
             drawTexturedModalRect(width / 2 - 121, height / 2, 0, 0, 242, 18);
 
@@ -238,7 +251,21 @@ public class GuiDownloading extends GuiScreen implements GuiYesNoCallback {
             fontRendererObj.drawStringWithShadow(progressText, x, y, 0x00FF00);
         }
         else if (installStage == 2) {
-            drawString(fontRendererObj, I18n.format("gui.mad.unzipping.info"), 50, 50, 0xFFFFFF);
+            mc.renderEngine.bindTexture(guiElements);
+            drawTexturedModalRect(width / 2 - 121, height / 2, 0, 0, 242, 18);
+            if (ContentHandler.unZipThread == null) return;
+
+            double progress = (double) ContentHandler.unZipThread.processed / (double) ContentHandler.unZipThread.size;
+            drawTexturedModalRect(width / 2 - 120, height / 2 + 1, 1, 18, (int) (progress * 240D), 16);
+            String progressText;
+            progressText = I18n.format("gui.mad.unzipping.info");
+            progressText += " " + Utils.round(progress * 100D, 100) + "% - " + ContentHandler.unZipThread.processed + " / " + ContentHandler.unZipThread.size;
+
+            int w = fontRendererObj.getStringWidth(progressText);
+            int x = width / 2 - w / 2;
+            int y = height / 2 + 5;
+            drawRect(x - 2, y - 2, x + w + 4, y + 10, 0x90000000);
+            fontRendererObj.drawStringWithShadow(progressText, x, y, 0x00FF00);
         }
         else if (installStage == 3) {
             drawString(fontRendererObj, I18n.format("gui.mad.successful.info"), 50, 50, 0x00FF00);

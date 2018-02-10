@@ -11,7 +11,7 @@ import net.minecraft.util.text.TextFormatting;
 /**
  * Created by brandon3055 on 17/9/2015.
  */
-public class GuiConfirmDownload extends GuiYesNo{
+public class GuiConfirmDownload extends GuiYesNo {
 
 	private String useExistingButtonText;
 	private boolean regional;
