@@ -44,6 +44,7 @@ public class ForgeEventHandler {
 	public void buttonPressed(GuiScreenEvent.ActionPerformedEvent.Pre event){
 		if (event.getGui() instanceof GuiMainMenu && event.getButton().id == 426){
 			event.getGui().mc.displayGuiScreen(new GuiDownloadList(event.getGui()));
+			ContentHandler.reloadContentList();
 			ContentHandler.updateCachedVersions();
 		}
 	}

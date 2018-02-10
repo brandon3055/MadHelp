@@ -57,6 +57,10 @@ public class ContentHandler {
 		updateSplashRevision();
 	}
 
+	public static void reloadContentList(){
+		readContentFile(getContentFile());
+	}
+
 	private static void updateSplashRevision(){
 		if (ConfigHandler.persistentSplashScreen) return;
 		else if (!ContentHandler.showSplashScreen) {
@@ -543,7 +547,7 @@ public class ContentHandler {
 			try {
 				URL downloadURL = new URL(content.downloadUrl);
 				URLConnection connection = downloadURL.openConnection();
-				downloadSize = connection.getContentLength();
+				downloadSize = connection.getContentLengthLong();
 				connection.setConnectTimeout(120000);
 				connection.setReadTimeout(120000);
 				downloadIS = connection.getInputStream();
