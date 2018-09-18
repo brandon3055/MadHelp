@@ -1,6 +1,5 @@
 package com.brandon3055.madhelp.client;
 
-import com.brandon3055.brandonscore.utils.DataUtils;
 import com.brandon3055.brandonscore.utils.Utils;
 import com.brandon3055.madhelp.LogHelper;
 import com.brandon3055.madhelp.MadHelp;
@@ -16,6 +15,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 /**
  * Created by brandon3055 on 17/9/2015.
@@ -107,6 +107,7 @@ public class GuiDownloading extends GuiScreen implements GuiYesNoCallback {
                 if (ContentHandler.unZipThread.error != null) {
                     message = ContentHandler.unZipThread.error;
                     installStage = 4;
+                    ContentHandler.unZipThread = null;
                     return;
                 }
                 ContentHandler.unZipThread = null;
@@ -152,8 +153,12 @@ public class GuiDownloading extends GuiScreen implements GuiYesNoCallback {
                 else {
                     if (!ContentHandler.worldFolder.renameTo(new File(ContentHandler.saveFolder, ContentHandler.worldFolder.getName())))
                         message = "Was unable to transfer world from temporary folder to saves folder...";
-                    try {FileUtils.deleteDirectory(ContentHandler.tempFolder); }
-                    catch (IOException e) { e.printStackTrace(); }
+                    try {
+                        FileUtils.deleteDirectory(ContentHandler.tempFolder);
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 if (StringUtils.isNullOrEmpty(message)) installStage = 3;
@@ -212,8 +217,12 @@ public class GuiDownloading extends GuiScreen implements GuiYesNoCallback {
         else {
             if (!ContentHandler.worldFolder.renameTo(new File(ContentHandler.saveFolder, newName)))
                 message = "Was unable to transfer world from temporary folder to saves folder...";
-            try {FileUtils.deleteDirectory(ContentHandler.tempFolder); }
-            catch (IOException e) { e.printStackTrace(); }
+            try {
+                FileUtils.deleteDirectory(ContentHandler.tempFolder);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         if (StringUtils.isNullOrEmpty(message)) installStage = 3;
@@ -242,13 +251,13 @@ public class GuiDownloading extends GuiScreen implements GuiYesNoCallback {
                 double progress = (double) downloaded / (double) fileSize;
                 if (progress < 0.0001) progress = 0;
                 progressText = I18n.format("gui.mad.downloading.info");
-                progressText += " " + Utils.round(progress * 100D, 100) + "% - " + DataUtils.formatFileSize(downloaded) + " / " + DataUtils.formatFileSize(fileSize);
+                progressText += " " + Utils.round(progress * 100D, 100) + "% - " + formatFileSize(downloaded) + " / " + formatFileSize(fileSize);
             }
-            int w = fontRendererObj.getStringWidth(progressText);
+            int w = fontRenderer.getStringWidth(progressText);
             int x = width / 2 - w / 2;
             int y = height / 2 + 5;
             drawRect(x - 2, y - 2, x + w + 4, y + 10, 0x90000000);
-            fontRendererObj.drawStringWithShadow(progressText, x, y, 0x00FF00);
+            fontRenderer.drawStringWithShadow(progressText, x, y, 0x00FF00);
         }
         else if (installStage == 2) {
             mc.renderEngine.bindTexture(guiElements);
@@ -261,28 +270,28 @@ public class GuiDownloading extends GuiScreen implements GuiYesNoCallback {
             progressText = I18n.format("gui.mad.unzipping.info");
             progressText += " " + Utils.round(progress * 100D, 100) + "% - " + ContentHandler.unZipThread.processed + " / " + ContentHandler.unZipThread.size;
 
-            int w = fontRendererObj.getStringWidth(progressText);
+            int w = fontRenderer.getStringWidth(progressText);
             int x = width / 2 - w / 2;
             int y = height / 2 + 5;
             drawRect(x - 2, y - 2, x + w + 4, y + 10, 0x90000000);
-            fontRendererObj.drawStringWithShadow(progressText, x, y, 0x00FF00);
+            fontRenderer.drawStringWithShadow(progressText, x, y, 0x00FF00);
         }
         else if (installStage == 3) {
-            drawString(fontRendererObj, I18n.format("gui.mad.successful.info"), 50, 50, 0x00FF00);
+            drawString(fontRenderer, I18n.format("gui.mad.successful.info"), 50, 50, 0x00FF00);
         }
         else if (installStage == 4) {
-            drawString(fontRendererObj, I18n.format("gui.mad.failed.info"), 50, 50, 0xFF0000);
-            fontRendererObj.drawSplitString(I18n.format("gui.mad.why.info"), 50, 70, width - 100, 0xFFFF00);
-            fontRendererObj.drawSplitString(message, 50, 80, width - 100, 0x909090);
+            drawString(fontRenderer, I18n.format("gui.mad.failed.info"), 50, 50, 0xFF0000);
+            fontRenderer.drawSplitString(I18n.format("gui.mad.why.info"), 50, 70, width - 100, 0xFFFF00);
+            fontRenderer.drawSplitString(message, 50, 80, width - 100, 0x909090);
 
             if (ContentHandler.downloadThread != null && !StringUtils.isNullOrEmpty(ContentHandler.downloadThread.getFaliureMessage())) {
-                fontRendererObj.drawSplitString("Why:", 50, 110, width - 100, 0xFFFF00);
-                fontRendererObj.drawSplitString(ContentHandler.downloadThread.getFaliureMessage(), 50, 120, width - 100, 0x909090);
+                fontRenderer.drawSplitString("Why:", 50, 110, width - 100, 0xFFFF00);
+                fontRenderer.drawSplitString(ContentHandler.downloadThread.getFaliureMessage(), 50, 120, width - 100, 0x909090);
             }
 
 
             if (message.equals("Download Failed")) {
-                fontRendererObj.drawSplitString("This downloader is not as sophisticated as most. If you are having trouble downloading the map try " + "downloading the map via the direct link. Then place the downloaded zip in the saves folder and run the installation process again. " + "(Or you could just unzip it your self)", 50, 200, width - 100, 0xFFFFFF);
+                fontRenderer.drawSplitString("This downloader is not as sophisticated as most. If you are having trouble downloading the map try " + "downloading the map via the direct link. Then place the downloaded zip in the saves folder and run the installation process again. " + "(Or you could just unzip it your self)", 50, 200, width - 100, 0xFFFFFF);
             }
         }
 
@@ -302,6 +311,13 @@ public class GuiDownloading extends GuiScreen implements GuiYesNoCallback {
             }
             mc.displayGuiScreen(parent);
         }
+    }
+
+    public static String formatFileSize(long size) {
+        if (size <= 0) return "0";
+        final String[] units = new String[]{"B", "kB", "MB", "GB", "TB"};
+        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 
 }

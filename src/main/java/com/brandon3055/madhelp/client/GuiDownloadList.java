@@ -47,11 +47,18 @@ public class GuiDownloadList extends GuiScreen implements GuiYesNoCallback {
         buttonList.add(websiteButton = new GuiButton(3, width / 2 - 50, height - 28, 100, 20, I18n.format("gui.mad.website.button")));
         buttonList.add(new GuiButton(4, width / 2 + 54, height - 28, 100, 20, I18n.format("gui.cancel")));
 
+//        buttonList.add(new GuiButton(99, width / 2 + 160, height - 28, 80, 20, "Reload") {
+//            @Override
+//            public void playPressSound(SoundHandler soundHandlerIn) {
+//                ConfigHandler.init(null);
+//                super.playPressSound(soundHandlerIn);
+//            }
+//        });
+
         downloadList.updateButtonStates();
     }
 
-    public void handleMouseInput() throws IOException
-    {
+    public void handleMouseInput() throws IOException {
         super.handleMouseInput();
         this.downloadList.handleMouseInput();
     }
@@ -61,8 +68,8 @@ public class GuiDownloadList extends GuiScreen implements GuiYesNoCallback {
         downloadList.drawScreen(x, y, tick);
         super.drawScreen(x, y, tick);
         if (!ContentHandler.status.equals("OK")) {
-            drawString(fontRendererObj, "Something went wrong!", 20, 10, 0xFF0000);
-            fontRendererObj.drawSplitString(ContentHandler.status, 20, 24, width - 40, 0x909090);
+            drawString(fontRenderer, "Something went wrong!", 20, 10, 0xFF0000);
+            fontRenderer.drawSplitString(ContentHandler.status, 20, 24, width - 40, 0x909090);
         }
     }
 
@@ -113,7 +120,8 @@ public class GuiDownloadList extends GuiScreen implements GuiYesNoCallback {
             if (result && id == 1) openLink(URI.create(mapList.get(selected).websiteUrl));
         }
         else if (id == 2) {
-            if (result && ContentHandler.downloadThread != null) mc.displayGuiScreen(new GuiDownloading(this, ContentHandler.downloadThread.getContent(), 1));
+            if (result && ContentHandler.downloadThread != null)
+                mc.displayGuiScreen(new GuiDownloading(this, ContentHandler.downloadThread.getContent(), 1));
             else mc.displayGuiScreen(this);
         }
         else if (id == 3) {
@@ -191,7 +199,7 @@ public class GuiDownloadList extends GuiScreen implements GuiYesNoCallback {
         }
 
         @Override
-        protected void drawSlot(int entryID, int insideLeft, int yPos, int insideSlotHeight, int mouseXIn, int mouseYIn) {
+        protected void drawSlot(int entryID, int insideLeft, int yPos, int insideSlotHeight, int mouseXIn, int mouseYIn, float pt) {
 
             DownloadableContent map = mapList.get(entryID);
             String s = map.displayName;
@@ -208,15 +216,15 @@ public class GuiDownloadList extends GuiScreen implements GuiYesNoCallback {
                 else {
                     us = TextFormatting.RED + " " + I18n.format("gui.mad.newVersion.info");
                 }
-                GuiDownloadList.this.drawString(GuiDownloadList.this.fontRendererObj, us, 10, yPos + 1, 0xFFFFFF);
+                GuiDownloadList.this.drawString(GuiDownloadList.this.fontRenderer, us, 10, yPos + 1, 0xFFFFFF);
             }
 
             String description = map.description;
             String type = map.isRegionDownload ? TextFormatting.DARK_RED + I18n.format("gui.mad.regionalDownload.info") : TextFormatting.GREEN + I18n.format("gui.mad.mapDownload.info");
 
-            GuiDownloadList.this.drawString(GuiDownloadList.this.fontRendererObj, s, insideLeft + 2, yPos + 1, 0xFFFFFF);
-            GuiDownloadList.this.drawString(GuiDownloadList.this.fontRendererObj, description, insideLeft + 2, yPos + 12, 0x808080);
-            GuiDownloadList.this.drawString(GuiDownloadList.this.fontRendererObj, type, insideLeft + 2, yPos + 12 + 10, 0xFFFFFF);
+            GuiDownloadList.this.drawString(GuiDownloadList.this.fontRenderer, s, insideLeft + 2, yPos + 1, 0xFFFFFF);
+            GuiDownloadList.this.drawString(GuiDownloadList.this.fontRenderer, description, insideLeft + 2, yPos + 12, 0x808080);
+            GuiDownloadList.this.drawString(GuiDownloadList.this.fontRenderer, type, insideLeft + 2, yPos + 12 + 10, 0xFFFFFF);
         }
     }
 }

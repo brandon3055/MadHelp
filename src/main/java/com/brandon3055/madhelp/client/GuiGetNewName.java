@@ -33,7 +33,7 @@ public class GuiGetNewName extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
-        textField = new GuiTextField(0, fontRendererObj, width / 2 - 100, height / 2 - 10, 200, 20);
+        textField = new GuiTextField(0, fontRenderer, width / 2 - 100, height / 2 - 10, 200, 20);
         textField.setTextColor(-1);
         textField.setDisabledTextColour(-1);
         textField.setEnableBackgroundDrawing(true);
@@ -56,8 +56,8 @@ public class GuiGetNewName extends GuiScreen {
     public void drawScreen(int x, int t, float tick) {
         drawDefaultBackground();
         textField.drawTextBox();
-        drawCenteredString(fontRendererObj, headingText, width / 2, height / 2 - 60, 0xFF0000);
-        drawCenteredString(fontRendererObj, I18n.format("gui.mad.selectNewName3.info"), width / 2, height / 2 - 30, 0xFFFFFF);
+        drawCenteredString(fontRenderer, headingText, width / 2, height / 2 - 60, 0xFF0000);
+        drawCenteredString(fontRenderer, I18n.format("gui.mad.selectNewName3.info"), width / 2, height / 2 - 30, 0xFFFFFF);
         super.drawScreen(x, t, tick);
     }
 
@@ -83,8 +83,12 @@ public class GuiGetNewName extends GuiScreen {
         else if (button.id == 1) {
             parent.message = I18n.format("gui.mad.cancelByUser.info");
             parent.installStage = 4;
-            try {FileUtils.deleteDirectory(ContentHandler.tempFolder); }
-            catch (IOException e) { e.printStackTrace(); }
+            try {
+                FileUtils.deleteDirectory(ContentHandler.tempFolder);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
             mc.displayGuiScreen(parent);
         }
     }
